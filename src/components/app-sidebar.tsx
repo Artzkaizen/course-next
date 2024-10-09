@@ -7,9 +7,9 @@ import {
   SidebarItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import { type CourseInfo } from "@/types/course";
 import CustomSelect from "./custom-select";
 import { useParams, useSearchParams } from "next/navigation";
+import useFetchCourseDetails from "@/hooks/useFetchCourseDetails";
 
 interface NavLinkProps {
   label: string;
@@ -24,7 +24,8 @@ const NavLink = ({ label, date, route }: NavLinkProps) => {
     ? new Date(date * 1000).toLocaleDateString("de-DE")
     : new Date().toLocaleDateString("de-DE");
 
-  const isActive = route.includes(searchParams);
+  const isActive =
+    route.includes(searchParams) && searchParams.includes("record");
   return (
     <Link
       href={route}
@@ -36,10 +37,12 @@ const NavLink = ({ label, date, route }: NavLinkProps) => {
   );
 };
 
-export function AppSidebar({ courses }: { courses: CourseInfo[] }) {
+export function AppSidebar() {
   const searchParams = useSearchParams();
   const { id: courseId } = useParams();
   const group = searchParams.get("group");
+
+  const { data: topics } = useFetchCourseDetails(parseInt(courseId as string));
 
   const getRoute = (value: string) => {
     return `/course/${courseId as string}?record=${value}${group ? `&group=${group}` : ""}`;
@@ -50,13 +53,13 @@ export function AppSidebar({ courses }: { courses: CourseInfo[] }) {
         <span className="font-bold">Übersicht</span>
         <CustomSelect
           className="ml-auto w-fit"
-          items={courses}
+          items={topics ?? []}
           // label={"Gruppe Wähle"}
           placeholder={"Getrennte Gruppen"}
         />
       </SidebarHeader>
       <SidebarContent>
-        {courses
+        {topics
           ?.filter((course) => {
             return group ? course.group_name === group : true;
           })

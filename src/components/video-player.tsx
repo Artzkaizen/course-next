@@ -20,14 +20,16 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useVideoStore } from "@/hooks/useVideoStore";
 import { cn } from "@/lib/utils";
-import { useSearchParams } from "next/navigation";
+import { type CourseInfo } from "@/types/course";
 
-export default function VideoPlayer() {
+export default function VideoPlayer({
+  topic,
+}: {
+  topic: CourseInfo | undefined;
+}) {
   const player = useVideoStore();
 
-  const record = useSearchParams().get("record");
-
-  const src = `https://vroom.b-trend.media/presentation/${record}/video/webcams.webm`;
+  const src = `https://vroom.b-trend.media/presentation/${topic?.recording_id}/video/webcams.webm`;
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<HTMLDivElement>(null);
@@ -171,6 +173,7 @@ export default function VideoPlayer() {
       ? `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
       : `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
+  if (!topic?.recording_id) return null;
 
   return (
     <div
@@ -261,6 +264,8 @@ export default function VideoPlayer() {
                 <SelectContent>
                   <SelectItem value="0.5">0.5x</SelectItem>
                   <SelectItem value="1">1x</SelectItem>
+                  <SelectItem value="1.2">1.2x</SelectItem>
+                  <SelectItem value="1.35">1.35x</SelectItem>
                   <SelectItem value="1.5">1.5x</SelectItem>
                   <SelectItem value="2">2x</SelectItem>
                 </SelectContent>

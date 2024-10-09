@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { htmlToJson } from "@/lib/htmlToJson";
 import { useVideoStore } from "@/hooks/useVideoStore";
 import useFetchCues from "@/hooks/useFetchCues";
-import { useSearchParams } from "next/navigation";
 
 const tabs = [
   { id: "tagesinhalte", label: "Tagesinhalte" },
@@ -22,17 +21,15 @@ export interface Cue {
 }
 
 interface CourseTabsProps {
-  topics: CourseInfo[];
+  topic: CourseInfo | undefined;
 }
 
-export default function CourseTabs({ topics }: CourseTabsProps) {
-  const record = useSearchParams().get("record");
-  const topic = topics.find((topic) => topic.record_id === record);
+export default function CourseTabs({ topic }: CourseTabsProps) {
   const { currentTime } = useVideoStore();
   const [activeTab, setActiveTab] = useState("tagesinhalte");
   const [activeCueIndex, setActiveCueIndex] = useState(-1);
 
-  const cues = useFetchCues("/video.vtt", record ?? "");
+  const cues = useFetchCues("/video.vtt", topic?.record_id ?? "");
 
   useEffect(() => {
     const index = cues.data?.findIndex(
