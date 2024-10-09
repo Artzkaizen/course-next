@@ -39,10 +39,9 @@ const NavLink = ({ label, date, route }: NavLinkProps) => {
 export function AppSidebar({ courses }: { courses: CourseInfo[] }) {
   const searchParams = useSearchParams();
   const { id: courseId } = useParams();
+  const group = searchParams.get("group");
 
   const getRoute = (value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    const group = params.get("group");
     return `/course/${courseId as string}?record=${value}${group ? `&group=${group}` : ""}`;
   };
   return (
@@ -57,15 +56,19 @@ export function AppSidebar({ courses }: { courses: CourseInfo[] }) {
         />
       </SidebarHeader>
       <SidebarContent>
-        {courses?.map((topic) => (
-          <SidebarItem key={topic.record_id}>
-            <NavLink
-              label={topic.lernfeld}
-              route={getRoute(topic.record_id)}
-              date={parseInt(topic.datum)}
-            />
-          </SidebarItem>
-        ))}
+        {courses
+          ?.filter((course) => {
+            return group ? course.group_name === group : true;
+          })
+          .map((topic) => (
+            <SidebarItem key={topic.record_id}>
+              <NavLink
+                label={topic.lernfeld}
+                route={getRoute(topic.record_id)}
+                date={parseInt(topic.datum)}
+              />
+            </SidebarItem>
+          ))}
       </SidebarContent>
     </Sidebar>
   );
