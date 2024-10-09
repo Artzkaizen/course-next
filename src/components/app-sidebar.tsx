@@ -11,29 +11,100 @@ import CustomSelect from "./custom-select";
 import { useParams, useSearchParams } from "next/navigation";
 import useFetchCourseDetails from "@/hooks/useFetchCourseDetails";
 
-interface NavLinkProps {
-  label: string;
-  route: string;
-  date?: number;
-  className?: string;
+import { Button } from "@/components/ui/button";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { type CourseInfo } from "@/types/course";
+
+export function CustomPopover({
+  data,
+  record,
+  module,
+}: {
+  record: string;
+  data: string;
+  module: string;
+}) {
+  const editUrl = (data: string, record: string) => {
+    const string = process.env.NEXT_PUBLIC_MOODLE_EDIT_URL;
+    return string?.replace("base", data).replace("record", record);
+  };
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild className="absolute right-0 top-0 z-10">
+        <Button
+          variant="outline"
+          className="border-0 bg-transparent p-1 shadow-none"
+        >
+          <DotsHorizontalIcon />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="flex w-fit flex-col gap-1 p-1">
+        <Button variant="ghost" asChild>
+          <Link
+            href={`${process.env.NEXT_PUBLIC_MOODLE_ADD_URL?.replace("module", module)}`}
+          >
+            Add
+          </Link>
+        </Button>
+        <Button variant="ghost" asChild>
+          <Link href={editUrl(data, record) ?? ""}>Edit</Link>
+        </Button>
+      </PopoverContent>
+    </Popover>
+  );
 }
 
-const NavLink = ({ label, date, route }: NavLinkProps) => {
-  const searchParams = useSearchParams().toString();
-  const formatDate = date
-    ? new Date(date * 1000).toLocaleDateString("de-DE")
+interface NavLinkProps {
+  topic: CourseInfo;
+  group?: string;
+  label: string;
+  courseId: string;
+  className?: string;
+  searchParams: URLSearchParams;
+}
+
+const NavLink = ({
+  topic,
+  label,
+  group,
+  courseId,
+  searchParams,
+}: NavLinkProps) => {
+  const formatDate = topic.datum
+    ? new Date(Number(topic.datum) * 1000).toLocaleDateString("de-DE")
     : new Date().toLocaleDateString("de-DE");
 
+  const getRoute = (value: string) => {
+    return `/course/${courseId}?record=${value}${group ? `&group=${group}` : ""}`;
+  };
+  const route = getRoute(topic.record_id);
   const isActive =
-    route.includes(searchParams) && searchParams.includes("record");
+    route.includes(searchParams.toString()) &&
+    searchParams.toString().includes("record");
+
   return (
-    <Link
-      href={route}
-      className={`border-primary p-1 text-sm transition-all duration-300 hover:border-l-4 hover:bg-secondary-foreground/10 ${isActive ? "border-l-4 bg-primary/10" : ""}`}
+    <div
+      className={`relative border-primary p-1 transition-all duration-300 hover:border-l-4 hover:bg-secondary-foreground/10 ${isActive ? "border-l-4 bg-primary/10" : ""}`}
     >
-      <span className="font-medium">{label}</span>
-      <span className="block text-sm">{formatDate}</span>
-    </Link>
+      <Link href={getRoute(topic.record_id)} className={"text-sm"}>
+        <span className="font-medium">
+          {label}
+
+          <CustomPopover
+            record={topic.record_id}
+            data={topic.data_id}
+            module={topic.course_module_id}
+          />
+        </span>
+        <span className="block text-sm">{formatDate}</span>
+      </Link>
+    </div>
   );
 };
 
@@ -44,9 +115,6 @@ export function AppSidebar() {
 
   const { data: topics } = useFetchCourseDetails(parseInt(courseId as string));
 
-  const getRoute = (value: string) => {
-    return `/course/${courseId as string}?record=${value}${group ? `&group=${group}` : ""}`;
-  };
   return (
     <Sidebar>
       <SidebarHeader>
@@ -66,9 +134,11 @@ export function AppSidebar() {
           .map((topic) => (
             <SidebarItem key={topic.record_id}>
               <NavLink
+                topic={topic}
+                group={group ?? ""}
                 label={topic.lernfeld}
-                route={getRoute(topic.record_id)}
-                date={parseInt(topic.datum)}
+                searchParams={searchParams}
+                courseId={courseId as string}
               />
             </SidebarItem>
           ))}
