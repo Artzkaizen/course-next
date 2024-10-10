@@ -36,6 +36,8 @@ export default function CustomSelect({
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const group = searchParams.get("group");
+
   const handleSelectChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -48,14 +50,19 @@ export default function CustomSelect({
     router.push(`?${params.toString()}`);
   };
 
+  const getGroup = () => {
+    if (group === null) return "all";
+    return group;
+  };
+
   return (
-    <Select onValueChange={handleSelectChange}>
+    <Select defaultValue={getGroup()} onValueChange={handleSelectChange}>
       <SelectTrigger className={`w-[180px] ${className}`}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>
-          <SelectLabel>{label}</SelectLabel>
+          {label && <SelectLabel>{label}</SelectLabel>}
           <SelectItem value="all">Alle Teilnehmer/innen</SelectItem>
           {uniqueGroups.map(
             (item) =>

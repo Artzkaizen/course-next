@@ -18,3 +18,10 @@ export const convertVTTTimeToSeconds = (time: string) => {
   const seconds = parseFloat(s!.replace(".", "")) / 1000;
   return parseInt(m!) * 60 + seconds;
 };
+
+export function parseMlangString(input: string, lang: string) {
+  const regex = new RegExp(`{mlang\\s${lang}}(.*?){mlang}`, "g");
+  const match = regex.exec(input);
+
+  return match ? match[1] : input;
+}

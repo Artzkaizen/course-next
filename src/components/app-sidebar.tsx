@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/popover";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { type CourseInfo } from "@/types/course";
+import { cn, parseMlangString } from "@/lib/utils";
 
 export function CustomPopover({
   data,
@@ -89,12 +90,14 @@ const NavLink = ({
     searchParams.toString().includes("record");
 
   return (
-    <div
-      className={`relative border-primary p-1 transition-all duration-300 hover:border-l-4 hover:bg-secondary-foreground/10 ${isActive ? "border-l-4 bg-primary/10" : ""}`}
+    <Button
+      asChild
+      variant={"ghost"}
+      className={`relative flex h-fit flex-col items-start justify-start rounded-none border-primary transition-all duration-300 hover:border-l-4 hover:bg-secondary-foreground/10 ${isActive ? "border-l-4 bg-primary/10" : ""}`}
     >
       <Link href={getRoute(topic.record_id)} className={"text-sm"}>
-        <span className="font-medium">
-          {label}
+        <span className="w-64 overflow-hidden text-clip text-balance font-medium">
+          {parseMlangString(label, "de")}
 
           <CustomPopover
             record={topic.record_id}
@@ -104,7 +107,7 @@ const NavLink = ({
         </span>
         <span className="block text-sm">{formatDate}</span>
       </Link>
-    </div>
+    </Button>
   );
 };
 
@@ -113,7 +116,9 @@ export function AppSidebar() {
   const { id: courseId } = useParams();
   const group = searchParams.get("group");
 
-  const { data: topics } = useFetchCourseDetails(parseInt(courseId as string));
+  const { data: topics, isPending } = useFetchCourseDetails(
+    parseInt(courseId as string),
+  );
 
   return (
     <Sidebar>
@@ -127,21 +132,27 @@ export function AppSidebar() {
         />
       </SidebarHeader>
       <SidebarContent>
-        {topics
-          ?.filter((course) => {
-            return group ? course.group_name === group : true;
-          })
-          .map((topic) => (
-            <SidebarItem key={topic.record_id}>
-              <NavLink
-                topic={topic}
-                group={group ?? ""}
-                label={topic.lernfeld}
-                searchParams={searchParams}
-                courseId={courseId as string}
-              />
-            </SidebarItem>
-          ))}
+        {isPending ? (
+          <div
+            className={cn("h-10 w-full animate-pulse rounded-md bg-primary")}
+          />
+        ) : (
+          topics
+            ?.filter((course) => {
+              return group ? course.group_name === group : true;
+            })
+            .map((topic) => (
+              <SidebarItem key={topic.record_id}>
+                <NavLink
+                  topic={topic}
+                  group={group ?? ""}
+                  label={topic.lernfeld}
+                  searchParams={searchParams}
+                  courseId={courseId as string}
+                />
+              </SidebarItem>
+            ))
+        )}
       </SidebarContent>
     </Sidebar>
   );

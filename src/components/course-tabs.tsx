@@ -1,10 +1,10 @@
 "use client";
-import { type CourseInfo } from "@/types/course";
-import { cn, formatTime } from "@/lib/utils";
+import parse from "html-react-parser";
 import { useEffect, useState } from "react";
-import { htmlToJson } from "@/lib/htmlToJson";
-import { useVideoStore } from "@/hooks/useVideoStore";
+import { cn, formatTime } from "@/lib/utils";
 import useFetchCues from "@/hooks/useFetchCues";
+import { type CourseInfo } from "@/types/course";
+import { useVideoStore } from "@/hooks/useVideoStore";
 
 const tabs = [
   { id: "tagesinhalte", label: "Tagesinhalte" },
@@ -38,8 +38,6 @@ export default function CourseTabs({ topic }: CourseTabsProps) {
     setActiveCueIndex(index!);
   }, [currentTime, cues]);
 
-  const formatted = htmlToJson(topic?.tagesinhalte ?? "");
-
   return (
     <div className="mx-auto w-full">
       <div className="border-b border-gray-200">
@@ -63,14 +61,7 @@ export default function CourseTabs({ topic }: CourseTabsProps) {
       </div>
 
       {activeTab === "tagesinhalte" && (
-        <div className="h-[20vh] w-[50vw]">
-          <h3 className="text-lg font-medium">{formatted?.p.content ?? ""}</h3>
-          <ul className="list-disc pl-5">
-            {formatted?.ul.li.map((item, index) => (
-              <li key={index}>{item.content}</li>
-            ))}
-          </ul>
-        </div>
+        <div>{parse(topic?.tagesinhalte ?? "")}</div>
       )}
       <div className="mt-4 h-[70vh] w-full overflow-auto p-4">
         {activeTab === "transcript" && (
