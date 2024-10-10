@@ -9,10 +9,11 @@ const config = {
   experimental: {
     // Enable the experimental feature to trust the proxy headers
     serverActions: {
-      // allowedForwardedHosts: ['localhost'],
       allowedOrigins: [
-        "https://v2cfgrg0-3000.euw.devtunnels.ms",
-        "https://staging.b-trend.digital",
+        "v2cfgrg0-3000.euw.devtunnels.ms",
+        "localhost:3000",
+        "staging.b-trend.digital",
+        "course-next.onrender.com",
       ],
     },
   },

@@ -111,6 +111,11 @@ export default function VideoPlayer({
     }
   };
 
+  useEffect(() => {
+    player.setPlaying(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [topic]);
+
   // Handle volume change
   const handleVolumeChange = (newVolume: number[]) => {
     const volumeValue = newVolume[0];

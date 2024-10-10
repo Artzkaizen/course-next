@@ -99,7 +99,8 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
 /**
  * Middleware for all lit requests
  */
-export const ltiAuthMiddleware = t.middleware(async ({ next }) => {
+export const ltiAuthMiddleware = t.middleware(async ({ ctx, next }) => {
+  console.log(ctx);
   return next();
 });
 

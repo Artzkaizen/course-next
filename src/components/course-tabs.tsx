@@ -5,6 +5,7 @@ import { cn, formatTime } from "@/lib/utils";
 import useFetchCues from "@/hooks/useFetchCues";
 import { type CourseInfo } from "@/types/course";
 import { useVideoStore } from "@/hooks/useVideoStore";
+import { useSearchParams } from "next/navigation";
 
 const tabs = [
   { id: "tagesinhalte", label: "Tagesinhalte" },
@@ -38,6 +39,10 @@ export default function CourseTabs({ topic }: CourseTabsProps) {
     setActiveCueIndex(index!);
   }, [currentTime, cues]);
 
+  if (!topic) {
+    return null;
+  }
+
   return (
     <div className="mx-auto w-full">
       <div className="border-b border-gray-200">
@@ -61,7 +66,7 @@ export default function CourseTabs({ topic }: CourseTabsProps) {
       </div>
 
       {activeTab === "tagesinhalte" && (
-        <div>{parse(topic?.tagesinhalte ?? "")}</div>
+        <div>{parse(topic.tagesinhalte ?? "")}</div>
       )}
       <div className="mt-4 h-[70vh] w-full overflow-auto p-4">
         {activeTab === "transcript" && (
@@ -95,13 +100,13 @@ export default function CourseTabs({ topic }: CourseTabsProps) {
         {activeTab === "tagesfolien" && (
           <iframe
             className="h-full w-full"
-            src={`https://staging.b-trend.digital/pluginfile.php/${topic?.tafelbild}`}
+            src={`https://staging.b-trend.digital/pluginfile.php/${topic.tafelbild}`}
           ></iframe>
         )}
         {activeTab === "präsentation" && (
           <iframe
             className="h-full w-full"
-            src={`https://staging.b-trend.digital/pluginfile.php/${topic?.präsentation}`}
+            src={`https://staging.b-trend.digital/pluginfile.php/${topic.präsentation}`}
           ></iframe>
         )}
         {activeTab === "discuss" && (

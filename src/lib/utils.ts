@@ -25,3 +25,17 @@ export function parseMlangString(input: string, lang: string) {
 
   return match ? match[1] : input;
 }
+
+export function parseRoles(rolesString: string) {
+  // Split the roles string by commas and trim whitespace
+  // return rolesString
+  //   .split(",")
+  //   .map((role) => role.trim().replace(/urn.*lis\//g, ""));
+
+  return new Set(
+    rolesString
+      .split(",")
+      .map((role) => role.trim().replace(/urn.*lis\//g, ""))
+      .filter((role) => role !== ""),
+  );
+}
