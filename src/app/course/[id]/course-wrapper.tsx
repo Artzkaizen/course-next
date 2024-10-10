@@ -2,16 +2,17 @@
 
 import CourseTabs from "@/components/course-tabs";
 import VideoPlayer from "@/components/video-player";
-import { type CourseInfo } from "@/types/course";
-import { useSearchParams } from "next/navigation";
+import useCourseStore from "@/hooks/useCourseStore";
 
-const CourseWrapper = ({ topics }: { topics: CourseInfo[] }) => {
-  const record = useSearchParams().get("record");
-  const topic = topics.find((topic) => topic.record_id === record);
+const CourseWrapper = () => {
+  const { currentTopic } = useCourseStore();
   return (
     <>
-      <VideoPlayer topic={topic} />
-      <CourseTabs topic={topic} />
+      <VideoPlayer
+        topic={currentTopic}
+        src={`https://vroom.b-trend.media/presentation/${currentTopic?.recording_id}/video/webcams.webm`}
+      />
+      <CourseTabs topic={currentTopic} />
     </>
   );
 };

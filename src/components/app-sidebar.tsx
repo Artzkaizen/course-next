@@ -7,6 +7,7 @@ import {
   SidebarItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { useEffect, useMemo } from "react";
 import CustomSelect from "./custom-select";
 import { useParams, useSearchParams } from "next/navigation";
 import useFetchCourseDetails from "@/hooks/useFetchCourseDetails";
@@ -20,12 +21,15 @@ import {
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { type CourseInfo } from "@/types/course";
 import { cn, parseMlangString } from "@/lib/utils";
+import useCourseStore from "@/hooks/useCourseStore";
 
 export function CustomPopover({
   data,
   record,
   module,
+  classname,
 }: {
+  classname?: string;
   record: string;
   data: string;
   module: string;
@@ -37,7 +41,10 @@ export function CustomPopover({
 
   return (
     <Popover>
-      <PopoverTrigger asChild className="absolute right-0 top-0 z-10">
+      <PopoverTrigger
+        asChild
+        className={cn("absolute right-0 top-0 z-10 opacity-0", classname)}
+      >
         <Button
           variant="outline"
           className="border-0 bg-transparent p-1 shadow-none"
@@ -93,13 +100,14 @@ const NavLink = ({
     <Button
       asChild
       variant={"ghost"}
-      className={`relative flex h-fit flex-col items-start justify-start rounded-none border-primary transition-all duration-300 hover:border-l-4 hover:bg-secondary-foreground/10 ${isActive ? "border-l-4 bg-primary/10" : ""}`}
+      className={`group relative flex h-fit flex-col items-start justify-start rounded-none border-primary transition-all duration-300 hover:border-l-4 hover:bg-primary/5 group-hover:block ${isActive ? "border-l-4 bg-primary/20" : ""}`}
     >
       <Link href={getRoute(topic.record_id)} className={"text-sm"}>
         <span className="w-64 overflow-hidden text-clip text-balance font-medium">
           {parseMlangString(label, "de")}
 
           <CustomPopover
+            classname="group-hover:opacity-100"
             record={topic.record_id}
             data={topic.data_id}
             module={topic.course_module_id}
@@ -115,10 +123,34 @@ export function AppSidebar() {
   const searchParams = useSearchParams();
   const { id: courseId } = useParams();
   const group = searchParams.get("group");
+  const record = searchParams.get("record");
 
-  const { data: topics, isPending } = useFetchCourseDetails(
+  const { topics, setTopics, setIsPending, setIsError, setCurrentTopic } =
+    useCourseStore();
+
+  const { data, isError, isPending } = useFetchCourseDetails(
     parseInt(courseId as string),
   );
+
+  const currentTopic = useMemo(() => {
+    return topics.find((topic) => topic.record_id === record);
+  }, [topics, record]);
+
+  useEffect(() => {
+    setTopics(data ?? []);
+    setIsPending(isPending);
+    setIsError(isError);
+    setCurrentTopic(currentTopic);
+  }, [
+    currentTopic,
+    data,
+    isError,
+    isPending,
+    setCurrentTopic,
+    setIsError,
+    setIsPending,
+    setTopics,
+  ]);
 
   return (
     <Sidebar>
@@ -126,7 +158,7 @@ export function AppSidebar() {
         <span className="font-bold">Übersicht</span>
         <CustomSelect
           className="ml-auto w-fit"
-          items={topics ?? []}
+          items={topics}
           // label={"Gruppe Wähle"}
           placeholder={"Getrennte Gruppen"}
         />
@@ -138,8 +170,8 @@ export function AppSidebar() {
           />
         ) : (
           topics
-            ?.filter((course) => {
-              return group ? course.group_name === group : true;
+            ?.filter((topic) => {
+              return group ? topic.group_name === group : true;
             })
             .map((topic) => (
               <SidebarItem key={topic.record_id}>

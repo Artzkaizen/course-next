@@ -24,12 +24,12 @@ import { type CourseInfo } from "@/types/course";
 
 export default function VideoPlayer({
   topic,
+  src,
 }: {
+  src: string;
   topic: CourseInfo | undefined;
 }) {
   const player = useVideoStore();
-
-  const src = `https://vroom.b-trend.media/presentation/${topic?.recording_id}/video/webcams.webm`;
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const playerRef = useRef<HTMLDivElement>(null);
@@ -62,7 +62,7 @@ export default function VideoPlayer({
         player.setPictureInPicture(false),
       );
     };
-  }, [player]);
+  }, [player, topic]);
 
   useEffect(() => {
     const resetTimeout = () => {

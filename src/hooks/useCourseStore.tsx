@@ -2,21 +2,25 @@ import { type CourseInfo } from "@/types/course";
 import { create } from "zustand";
 
 type CourseStore = {
-  courses: CourseInfo[];
+  topics: CourseInfo[];
   isPending: boolean;
   isError: boolean;
+  currentTopic: CourseInfo | undefined;
   setIsError: (isPending: boolean) => void;
   setIsPending: (isPending: boolean) => void;
-  setCourses: (courses: CourseInfo[]) => void;
+  setTopics: (topics: CourseInfo[]) => void;
+  setCurrentTopic: (topic: CourseInfo | undefined) => void;
 };
 
 const useCourseStore = create<CourseStore>()((set) => ({
-  courses: [],
+  topics: [],
+  currentTopic: undefined,
   isPending: false,
   isError: false,
-  setIsError: (isPending) => set({ isPending }),
+  setIsError: (isError) => set({ isError }),
   setIsPending: (isPending) => set({ isPending }),
-  setCourses: (courses) => set(() => ({ courses })),
+  setTopics: (topics) => set(() => ({ topics })),
+  setCurrentTopic: (currentTopic) => set(() => ({ currentTopic })),
 }));
 
 export default useCourseStore;
