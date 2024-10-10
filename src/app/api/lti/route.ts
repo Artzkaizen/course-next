@@ -2,6 +2,7 @@ import { type z } from "zod";
 import { api } from "@/trpc/server";
 import { type NextRequest, NextResponse } from "next/server";
 import { type LaunchRequestLegacy } from "@/server/api/routers/launch";
+import { env } from "@/env";
 
 export async function POST(request: NextRequest) {
   const bodyText = await request.text();
@@ -21,6 +22,6 @@ export async function POST(request: NextRequest) {
   // const baseUrl = request.nextUrl.origin;
 
   return NextResponse.redirect(
-    `https://v2cfgrg0-3000.euw.devtunnels.ms/course/${user.courseid}`,
+    `${env.NEXT_PUBLIC_DOMAIN}/course/${user.courseid}`,
   );
 }
