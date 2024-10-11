@@ -22,7 +22,6 @@ import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { type CourseInfo } from "@/types/course";
 import { cn, parseMlangString } from "@/lib/utils";
 import useCourseStore from "@/hooks/useCourseStore";
-import { env } from "@/env";
 
 export function CustomPopover({
   data,
@@ -36,7 +35,7 @@ export function CustomPopover({
   module: string;
 }) {
   const editUrl = (data: string, record: string) => {
-    const string = env.NEXT_PUBLIC_MOODLE_EDIT_URL;
+    const string = process.env.NEXT_PUBLIC_MOODLE_EDIT_URL;
     return string?.replace("base", data).replace("record", record);
   };
 
@@ -56,7 +55,7 @@ export function CustomPopover({
       <PopoverContent className="flex w-fit flex-col gap-1 p-1">
         <Button variant="ghost" asChild>
           <Link
-            href={`${env.NEXT_PUBLIC_MOODLE_ADD_URL?.replace("module", module)}`}
+            href={`${process.env.NEXT_PUBLIC_MOODLE_ADD_URL?.replace("module", module)}`}
           >
             Add
           </Link>
